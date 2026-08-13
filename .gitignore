@@ -1,0 +1,50 @@
+# Secrets / local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+secrets.json
+local.settings.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs / temporary files
+*.log
+logs/
+tmp/
+.cache/
+
+# Data exports / local DBs
+*.csv
+*.xlsx
+*.db
+*.sqlite
+*.sqlite3
+exports/
+private_data/
+
+# Build artifacts
+dist/
+build/
