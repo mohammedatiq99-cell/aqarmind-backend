@@ -1,5 +1,8 @@
 # Aqarmind — AI Real Estate Advisor | Backend
 
+[![Python CI](https://github.com/mohammedatiq99-cell/aqarmind-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/mohammedatiq99-cell/aqarmind-backend/actions/workflows/ci.yml)
+
+
 **Python · FastAPI · Azure OpenAI · Azure AI Search · Azure SQL · LLM Function Calling · Docker**
 
 Aqarmind is an AI-powered real estate advisory platform for conversational property discovery, comparisons, mortgage estimates, and lead engagement. This repository is a **public, sanitized reference implementation** of its Python backend, focused on how language-model reasoning connects to deterministic tools, structured data, and retrieval services.
