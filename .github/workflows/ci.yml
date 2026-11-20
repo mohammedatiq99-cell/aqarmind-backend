@@ -1,17 +1,31 @@
-name: CI
+name: Python CI
 
 on:
   push:
     branches: [main]
   pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
-  test:
+  tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-      - run: pip install -r requirements.txt
-      - run: pytest -q
+          python-version: '3.11'
+          cache: pip
+      - name: Install ODBC runtime
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends unixodbc
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Compile application
+        run: python -m compileall -q app
+      - name: Run tests
+        run: python -m pytest -q

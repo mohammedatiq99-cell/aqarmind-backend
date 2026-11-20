@@ -1,19 +1,17 @@
-# Security Policy
+# Security policy and disclosure
 
-## Public repository rules
+## Intended use
 
-Do not commit:
+This is a **public portfolio reference**, not a hardened, deployable production API. Several endpoints are not authenticated, and the sample does not implement tenant authorization, rate limiting, or complete monitoring. Do not expose this version as a business service without the controls listed in [deployment notes](docs/deployment-notes.md).
 
-- API keys or access tokens
-- Azure SQL credentials
-- connection strings containing credentials
-- private endpoints intended to remain confidential
-- certificates or private keys
-- production customer / lead data
-- private prompt or business-policy content that should remain internal
+## Repository hygiene
 
-Use `.env.example` for variable names only and store real values in a local `.env` file or a secure secret store.
+Do not commit real API keys, bearer tokens, SQL passwords, connection strings with credentials, private endpoints, certificates/private keys, customer/lead data, or private operational documents. Use `.env.example` for configuration names and place actual development secrets in a local ignored `.env` file. Never copy `.env` into a Docker image.
 
-For Azure production workloads, prefer managed identity and Azure Key Vault where supported.
+For Azure production workloads, prefer managed identity and a secure secret store where supported. Review logs to ensure lead data and tokens are not exposed. Treat frontend source as public and do not embed server secrets there.
 
-If a credential is accidentally committed, treat it as compromised: revoke or rotate it immediately, remove it from Git history, and review relevant audit logs.
+**If a credential was committed**, assume it is compromised, revoke or rotate it, inspect access logs, and remove it from Git history. `.gitignore` does not remove previously committed values.
+
+## Reporting
+
+For a suspected vulnerability, contact the repository owner privately through the contact methods provided on their GitHub profile rather than publishing an exploit or credentials in an issue.
