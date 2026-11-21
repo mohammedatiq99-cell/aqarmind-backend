@@ -29,3 +29,33 @@ jobs:
         run: python -m compileall -q app
       - name: Run tests
         run: python -m pytest -q
+
+
+  build:
+    name: Build Docker Image
+    needs: tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t aqarmind-backend:ci .
+
+      - name: Start Docker container
+        run: docker run -d --name aqarmind-ci -p 8000:8000 aqarmind-backend:ci
+
+      - name: Verify container health
+        run: |
+          for i in {1..15}; do
+            if curl --fail --silent http://localhost:8000/health; then
+              echo "Aqarmind container is healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs aqarmind-ci
+          exit 1
+
