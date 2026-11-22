@@ -110,10 +110,18 @@ jobs:
 
           unset ACR_TOKEN
 
+      
       - name: Build and push Docker image
         shell: bash
         run: |
-          IMAGE="${ACR_LOGIN_SERVER}/${IMAGE_REPO}:${GITHUB_SHA}"
-          docker build -t "$IMAGE" .
+          IMAGE="${ACR_LOGIN_SERVER}/${IMAGE_REPO}:${GITHUB_SHA}-compat"
+
+          docker buildx build \
+            --platform linux/amd64 \
+            --provenance=false \
+            --load \
+            -t "$IMAGE" .
+
           docker push "$IMAGE"
-          echo "Published image: $IMAGE"
+          echo "Published compatibility-test image: $IMAGE"
+
