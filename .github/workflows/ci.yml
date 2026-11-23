@@ -56,3 +56,70 @@ jobs:
           done
           docker logs aqarmind-ci
           exit 1
+
+ 
+  publish:
+    name: Publish Docker Image to ACR
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Azure using GitHub OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          allow-no-subscriptions: true
+
+      - name: Authenticate Docker to ACR
+        env:
+          ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        run: |
+          set -euo pipefail
+
+          AAD_TOKEN="$(az account get-access-token \
+            --resource https://containerregistry.azure.net \
+            --query accessToken -o tsv)"
+
+          ACR_REFRESH_TOKEN="$(curl -fsS \
+            --data-urlencode "grant_type=access_token" \
+            --data-urlencode "service=${ACR_LOGIN_SERVER}" \
+            --data-urlencode "tenant=${AZURE_TENANT_ID}" \
+            --data-urlencode "access_token=${AAD_TOKEN}" \
+            "https://${ACR_LOGIN_SERVER}/oauth2/exchange" \
+            | python -c "import json,sys; print(json.load(sys.stdin)['refresh_token'])")"
+
+          echo "::add-mask::$ACR_REFRESH_TOKEN"
+
+          printf '%s' "$ACR_REFRESH_TOKEN" | docker login \
+            "$ACR_LOGIN_SERVER" \
+            --username "00000000-0000-0000-0000-000000000000" \
+            --password-stdin
+
+      - name: Build and push image
+        env:
+          ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER }}
+        run: |
+          set -euo pipefail
+
+          IMAGE="${ACR_LOGIN_SERVER}/aqarmind-backend:${GITHUB_SHA}"
+
+          docker buildx build \
+            --platform linux/amd64 \
+            --provenance=false \
+            --tag "$IMAGE" \
+            --push .
+
+          echo "Image published: $IMAGE"
+     
