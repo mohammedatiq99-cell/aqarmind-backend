@@ -61,7 +61,7 @@ jobs:
   publish:
     name: Publish Docker Image to ACR
     needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ENABLE_AZURE_DEPLOY == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
