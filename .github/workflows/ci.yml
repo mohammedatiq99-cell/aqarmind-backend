@@ -123,3 +123,22 @@ jobs:
 
           echo "Image published: $IMAGE"
      
+      - name: Deploy image to Azure Container Apps
+        env:
+          ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run: |
+          set -euo pipefail
+
+          IMAGE="${ACR_LOGIN_SERVER}/aqarmind-backend:${GITHUB_SHA}"
+
+          echo "Deploying image: $IMAGE"
+
+          az containerapp update \
+            --name ca-aqarmind-cicd-v2-test \
+            --resource-group rg-aqarmind-cicd-v2 \
+            --subscription "$AZURE_SUBSCRIPTION_ID" \
+            --container-name aqarmind-api \
+            --image "$IMAGE"
+
+          echo "Container App update submitted successfully"
