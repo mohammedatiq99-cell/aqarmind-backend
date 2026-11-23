@@ -36,6 +36,15 @@ def health():
     return {"status": "ok"}
 
 
+@router.get("/cicd-proof")
+def cicd_proof():
+    return {
+        "status": "deployed",
+        "pipeline": "github-actions",
+        "version": "v2-proof"
+    }
+
+
 @router.get("/config-check")
 def config_check():
     # Deliberately returns readiness booleans only—never secret values.

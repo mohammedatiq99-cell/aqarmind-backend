@@ -19,3 +19,8 @@ def test_config_check_never_returns_secret_values():
         "search_configured",
         "database_configured",
     }
+
+def test_cicd_proof():
+    response = client.get("/cicd-proof")
+    assert response.status_code == 200
+    assert response.json()["version"] == "v2-proof"
